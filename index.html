@@ -45,12 +45,13 @@
 
         .periodic-table {
             display: grid;
-            grid-template-columns: repeat(18, minmax(80px, 1fr));
+            grid-template-columns: repeat(18, minmax(70px, 1fr));
             gap: 4px;
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
             animation: fadeInUp 1s ease-out 0.3s both;
+            min-width: fit-content;
         }
 
         .element {
@@ -399,13 +400,28 @@
 
         @media (max-width: 1200px) {
             .periodic-table {
-                grid-template-columns: repeat(12, minmax(70px, 1fr));
+                grid-template-columns: repeat(18, minmax(60px, 1fr));
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .periodic-table {
+                grid-template-columns: repeat(18, minmax(50px, 1fr));
+                padding: 10px;
+                gap: 3px;
+            }
+            
+            .element {
+                font-size: 0.75em;
             }
         }
 
         @media (max-width: 768px) {
             .periodic-table {
-                grid-template-columns: repeat(6, minmax(60px, 1fr));
+                grid-template-columns: repeat(18, minmax(45px, 1fr));
+                padding: 10px;
+                gap: 2px;
             }
             
             .header h1 {
@@ -414,6 +430,32 @@
             
             .element {
                 font-size: 0.7em;
+                padding: 4px;
+            }
+            
+            .element-name {
+                font-size: 0.6em;
+            }
+            
+            .element-category {
+                font-size: 0.45em;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .periodic-table {
+                grid-template-columns: repeat(18, minmax(40px, 1fr));
+                padding: 5px;
+                gap: 2px;
+            }
+            
+            .element {
+                font-size: 0.65em;
+                padding: 3px;
+            }
+            
+            .element-name {
+                font-size: 0.55em;
             }
         }
     </style>
@@ -425,7 +467,8 @@
     </div>
 
     <div class="periodic-table" id="periodicTable">
-        <!-- Row 1 -->
+        <!-- Row 1 - Centered with 8 empty cells on each side -->
+        <div class="element empty"></div>
         <div class="element llm" data-info="GPT-4 by OpenAI - Advanced language model for text generation and conversation">
             <div class="element-symbol">GPT</div>
             <div class="element-name">GPT-4</div>
@@ -445,15 +488,14 @@
         <div class="element empty"></div>
         <div class="element empty"></div>
         <div class="element empty"></div>
-        <div class="element empty"></div>
-        <div class="element empty"></div>
         <div class="element llm" data-info="Claude by Anthropic - Constitutional AI assistant focused on helpfulness and safety">
             <div class="element-symbol">Cl</div>
             <div class="element-name">Claude</div>
             <div class="element-category">LLM</div>
         </div>
+        <div class="element empty"></div>
 
-        <!-- Row 2 -->
+        <!-- Row 2 - Centered LLMs and Image Gen tools -->
         <div class="element llm" data-info="Gemini by Google - Multimodal AI model for text, images, and code">
             <div class="element-symbol">Gm</div>
             <div class="element-name">Gemini</div>
@@ -499,8 +541,9 @@
             <div class="element-name">Canva</div>
             <div class="element-category">Design</div>
         </div>
+        <div class="element empty"></div>
 
-        <!-- Row 3 -->
+        <!-- Row 3 - Centered Code and Media tools -->
         <div class="element code" data-info="GitHub Copilot - AI pair programmer for code completion">
             <div class="element-symbol">Cp</div>
             <div class="element-name">Copilot</div>
@@ -546,8 +589,9 @@
             <div class="element-name">Synthesia</div>
             <div class="element-category">Video</div>
         </div>
+        <div class="element empty"></div>
 
-        <!-- Row 4 -->
+        <!-- Row 4 - Full row -->
         <div class="element productivity" data-info="Notion AI - AI-powered workspace and note-taking">
             <div class="element-symbol">No</div>
             <div class="element-name">Notion AI</div>
@@ -639,7 +683,7 @@
             <div class="element-category">Search</div>
         </div>
 
-        <!-- Row 5 -->
+        <!-- Row 5 - Full row -->
         <div class="element code" data-info="Replit AI - AI-powered coding platform">
             <div class="element-symbol">Rp</div>
             <div class="element-name">Replit</div>
