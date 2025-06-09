@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Tools Periodic Table</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            color: white;
+            overflow-x: auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            font-weight: 700;
+            background: linear-gradient(45deg, #00f5ff, #ff00ff, #ffff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.8;
+            font-weight: 300;
+        }
+
+        .periodic-table {
+            display: grid;
+            grid-template-columns: repeat(18, minmax(80px, 1fr));
+            gap: 4px;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        .element {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            font-size: 0.85em;
+            text-align: center;
+            padding: 8px;
+        }
+
+        .element::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            opacity: 0.1;
+            border-radius: 10px;
+        }
+
+        .element-symbol {
+            font-size: 1.4em;
+            font-weight: bold;
+            z-index: 1;
+            line-height: 1;
+            margin-bottom: 2px;
+        }
+
+        .element-name {
+            font-size: 0.7em;
+            opacity: 0.9;
+            z-index: 1;
+            font-weight: 500;
+            line-height: 1.1;
+        }
+
+        .element-category {
+            font-size: 0.5em;
+            opacity: 0.7;
+            z-index: 1;
+            margin-top: 2px;
+        }
+
+        /* Category Colors */
+        .llm {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            box-shadow: 0 8px 32px rgba(255, 107, 107, 0.3);
+        }
+
+        .image-gen {
+            background: linear-gradient(135deg, #4ecdc4, #44bd87);
+            box-shadow: 0 8px 32px rgba(78, 205, 196, 0.3);
+        }
+
+        .audio {
+            background: linear-gradient(135deg, #a8e6cf, #7fcdcd);
+            box-shadow: 0 8px 32px rgba(168, 230, 207, 0.3);
+        }
+
+        .video {
+            background: linear-gradient(135deg, #ffd93d, #ff6b6b);
+            box-shadow: 0 8px 32px rgba(255, 217, 61, 0.3);
+        }
+
+        .code {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            box-shadow: 0 8px 32px rgba(108, 92, 231, 0.3);
+        }
+
+        .research {
+            background: linear-gradient(135deg, #fd79a8, #fdcb6e);
+            box-shadow: 0 8px 32px rgba(253, 121, 168, 0.3);
+        }
+
+        .productivity {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            box-shadow: 0 8px 32px rgba(0, 184, 148, 0.3);
+        }
+
+        .design {
+            background: linear-gradient(135deg, #e17055, #fab1a0);
+            box-shadow: 0 8px 32px rgba(225, 112, 85, 0.3);
+        }
+
+        .data {
+            background: linear-gradient(135deg, #0984e3, #74b9ff);
+            box-shadow: 0 8px 32px rgba(9, 132, 227, 0.3);
+        }
+
+        .search {
+            background: linear-gradient(135deg, #2d3436, #636e72);
+            box-shadow: 0 8px 32px rgba(45, 52, 54, 0.3);
+        }
+
+        .element:hover {
+            transform: scale(1.1) translateY(-10px);
+            border-color: rgba(255, 255, 255, 0.5);
+            z-index: 10;
+            box-shadow: 0 20px 60px rgba(255, 255, 255, 0.2);
+        }
+
+        .element:hover::before {
+            opacity: 0.2;
+        }
+
+        .empty {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+            animation: fadeIn 1s ease-out 0.6s both;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            pointer-events: none;
+            z-index: 1000;
+            max-width: 200px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(26, 26, 46, 0.95), rgba(22, 33, 62, 0.95));
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            transform: scale(0.8);
+            animation: modalSlideIn 0.3s ease-out forwards;
+            position: relative;
+        }
+
+        @keyframes modalSlideIn {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .modal-title {
+            flex: 1;
+        }
+
+        .modal-title h2 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+            background: linear-gradient(45deg, #00f5ff, #ff00ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .modal-category {
+            font-size: 0.9em;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-body {
+            line-height: 1.6;
+        }
+
+        .modal-section {
+            margin-bottom: 20px;
+        }
+
+        .modal-section h3 {
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            color: #00f5ff;
+        }
+
+        .modal-section p, .modal-section ul {
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .modal-section ul {
+            padding-left: 20px;
+        }
+
+        .modal-section li {
+            margin-bottom: 5px;
+        }
+
+        .pricing-tag {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-right: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s;
+        }
+
+        .close-btn:hover {
+            opacity: 1;
+        }
+
+        .website-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #00f5ff, #ff00ff);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            margin-top: 10px;
+            transition: transform 0.3s;
+        }
+
+        .website-link:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .periodic-table {
+                grid-template-columns: repeat(12, minmax(70px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .periodic-table {
+                grid-template-columns: repeat(6, minmax(60px, 1fr));
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .element {
+                font-size: 0.7em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>AI Tools Periodic Table</h1>
+        <p class="subtitle">Explore the Elements of Artificial Intelligence</p>
+    </div>
+
+    <div class="periodic-table" id="periodicTable">
+        <!-- Row 1 -->
+        <div class="element llm" data-info="GPT-4 by OpenAI - Advanced language model for text generation and conversation">
+            <div class="element-symbol">GPT</div>
+            <div class="element-name">GPT-4</div>
+            <div class="element-category">LLM</div>
+        </div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element llm" data-info="Claude by Anthropic - Constitutional AI assistant focused on helpfulness and safety">
+            <div class="element-symbol">Cl</div>
+            <div class="element-name">Claude</div>
+            <div class="element-category">LLM</div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="element llm" data-info="Gemini by Google - Multimodal AI model for text, images, and code">
+            <div class="element-symbol">Gm</div>
+            <div class="element-name">Gemini</div>
+            <div class="element-category">LLM</div>
+        </div>
+        <div class="element llm" data-info="LLaMA by Meta - Large Language Model Architecture for research">
+            <div class="element-symbol">Ll</div>
+            <div class="element-name">LLaMA</div>
+            <div class="element-category">LLM</div>
+        </div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element image-gen" data-info="DALL-E by OpenAI - AI image generation from text prompts">
+            <div class="element-symbol">De</div>
+            <div class="element-name">DALL-E</div>
+            <div class="element-category">Image</div>
+        </div>
+        <div class="element image-gen" data-info="Midjourney - AI art generation platform">
+            <div class="element-symbol">Mj</div>
+            <div class="element-name">Midjourney</div>
+            <div class="element-category">Image</div>
+        </div>
+        <div class="element image-gen" data-info="Stable Diffusion - Open-source image generation model">
+            <div class="element-symbol">Sd</div>
+            <div class="element-name">Stable Diff</div>
+            <div class="element-category">Image</div>
+        </div>
+        <div class="element design" data-info="Figma AI - Design assistance and automation tools">
+            <div class="element-symbol">Fg</div>
+            <div class="element-name">Figma AI</div>
+            <div class="element-category">Design</div>
+        </div>
+        <div class="element design" data-info="Canva AI - Automated design and content creation">
+            <div class="element-symbol">Cv</div>
+            <div class="element-name">Canva</div>
+            <div class="element-category">Design</div>
+        </div>
+
+        <!-- Row 3 -->
+        <div class="element code" data-info="GitHub Copilot - AI pair programmer for code completion">
+            <div class="element-symbol">Cp</div>
+            <div class="element-name">Copilot</div>
+            <div class="element-category">Code</div>
+        </div>
+        <div class="element code" data-info="Cursor - AI-powered code editor">
+            <div class="element-symbol">Cr</div>
+            <div class="element-name">Cursor</div>
+            <div class="element-category">Code</div>
+        </div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element empty"></div>
+        <div class="element audio" data-info="ElevenLabs - AI voice synthesis and cloning">
+            <div class="element-symbol">El</div>
+            <div class="element-name">ElevenLabs</div>
+            <div class="element-category">Audio</div>
+        </div>
+        <div class="element audio" data-info="Mubert - AI music generation platform">
+            <div class="element-symbol">Mb</div>
+            <div class="element-name">Mubert</div>
+            <div class="element-category">Audio</div>
+        </div>
+        <div class="element audio" data-info="Suno - AI music and song generation">
+            <div class="element-symbol">Su</div>
+            <div class="element-name">Suno</div>
+            <div class="element-category">Audio</div>
+        </div>
+        <div class="element video" data-info="RunwayML - AI video generation and editing">
+            <div class="element-symbol">Rw</div>
+            <div class="element-name">Runway</div>
+            <div class="element-category">Video</div>
+        </div>
+        <div class="element video" data-info="Synthesia - AI video generation with avatars">
+            <div class="element-symbol">Sy</div>
+            <div class="element-name">Synthesia</div>
+            <div class="element-category">Video</div>
+        </div>
+
+        <!-- Row 4 -->
+        <div class="element productivity" data-info="Notion AI - AI-powered workspace and note-taking">
+            <div class="element-symbol">No</div>
+            <div class="element-name">Notion AI</div>
+            <div class="element-category">Productivity</div>
+        </div>
+        <div class="element productivity" data-info="Grammarly - AI writing assistant and grammar checker">
+            <div class="element-symbol">Gr</div>
+            <div class="element-name">Grammarly</div>
+            <div class="element-category">Productivity</div>
+        </div>
+        <div class="element productivity" data-info="Jasper - AI content creation and copywriting">
+            <div class="element-symbol">Js</div>
+            <div class="element-name">Jasper</div>
+            <div class="element-category">Productivity</div>
+        </div>
+        <div class="element productivity" data-info="Copy.ai - AI copywriting and content generation">
+            <div class="element-symbol">Ca</div>
+            <div class="element-name">Copy.ai</div>
+            <div class="element-category">Productivity</div>
+        </div>
+        <div class="element research" data-info="Perplexity - AI-powered search and research assistant">
+            <div class="element-symbol">Px</div>
+            <div class="element-name">Perplexity</div>
+            <div class="element-category">Research</div>
+        </div>
+        <div class="element research" data-info="Semantic Scholar - AI research paper discovery">
+            <div class="element-symbol">Ss</div>
+            <div class="element-name">Semantic</div>
+            <div class="element-category">Research</div>
+        </div>
+        <div class="element research" data-info="ResearchRabbit - AI research discovery platform">
+            <div class="element-symbol">Rr</div>
+            <div class="element-name">Research Rabbit</div>
+            <div class="element-category">Research</div>
+        </div>
+        <div class="element data" data-info="Tableau AI - AI-powered data visualization">
+            <div class="element-symbol">Ta</div>
+            <div class="element-name">Tableau</div>
+            <div class="element-category">Data</div>
+        </div>
+        <div class="element data" data-info="MonkeyLearn - AI text analysis and classification">
+            <div class="element-symbol">Ml</div>
+            <div class="element-name">MonkeyLearn</div>
+            <div class="element-category">Data</div>
+        </div>
+        <div class="element data" data-info="DataRobot - Automated machine learning platform">
+            <div class="element-symbol">Dr</div>
+            <div class="element-name">DataRobot</div>
+            <div class="element-category">Data</div>
+        </div>
+        <div class="element video" data-info="Luma AI - 3D capture and neural rendering">
+            <div class="element-symbol">Lu</div>
+            <div class="element-name">Luma AI</div>
+            <div class="element-category">Video</div>
+        </div>
+        <div class="element video" data-info="Pika Labs - AI video generation">
+            <div class="element-symbol">Pk</div>
+            <div class="element-name">Pika</div>
+            <div class="element-category">Video</div>
+        </div>
+        <div class="element audio" data-info="Adobe Podcast - AI audio enhancement">
+            <div class="element-symbol">Ap</div>
+            <div class="element-name">Adobe Pod</div>
+            <div class="element-category">Audio</div>
+        </div>
+        <div class="element audio" data-info="Descript - AI audio and video editing">
+            <div class="element-symbol">Ds</div>
+            <div class="element-name">Descript</div>
+            <div class="element-category">Audio</div>
+        </div>
+        <div class="element search" data-info="You.com - AI-powered search engine">
+            <div class="element-symbol">You</div>
+            <div class="element-name">You.com</div>
+            <div class="element-category">Search</div>
+        </div>
+        <div class="element search" data-info="Bing AI - Microsoft's AI-powered search">
+            <div class="element-symbol">Bg</div>
+            <div class="element-name">Bing AI</div>
+            <div class="element-category">Search</div>
+        </div>
+        <div class="element search" data-info="Phind - AI search for developers">
+            <div class="element-symbol">Ph</div>
+            <div class="element-name">Phind</div>
+            <div class="element-category">Search</div>
+        </div>
+        <div class="element search" data-info="Kagi - Privacy-focused AI search">
+            <div class="element-symbol">Kg</div>
+            <div class="element-name">Kagi</div>
+            <div class="element-category">Search</div>
+        </div>
+
+        <!-- Row 5 -->
+        <div class="element code" data-info="Replit AI - AI-powered coding platform">
+            <div class="element-symbol">Rp</div>
+            <div class="element-name">Replit</div>
+            <div class="element-category">Code</div>
+        </div>
+        <div class="element code" data-info="Tabnine - AI code completion assistant">
+            <div class="element-symbol">Tn</div>
+            <div class="element-name">Tabnine</div>
+            <div class="element-category">Code</div>
+        </div>
+        <div class="element code" data-info="Codeium - Free AI code completion">
+            <div class="element-symbol">Cd</div>
+            <div class="element-name">Codeium</div>
+            <div class="element-category">Code</div>
+        </div>
+        <div class="element code" data-info="Sourcegraph Cody - AI coding assistant">
+            <div class="element-symbol">Sg</div>
+            <div class="element-name">Cody</div>
+            <div class="element-category">Code</div>
+        </div>
+        <div class="element productivity" data-info="Otter.ai - AI meeting transcription">
+            <div class="element-symbol">Ot</div>
+            <div class="element-name">Otter.ai</div>
+            <div class="element-category">Productivity</div>
+        </div>
+        <div class="element productivity" data-info="Calendly AI - AI scheduling assistant">
+            <div class="element-symbol">Cy</div>
+            <div class="element-name">Calendly</div>
+            <div class="element-category">Productivity</div>
+        </div>
+        <div class="element productivity" data-info="Zapier AI - AI workflow automation">
+            <div class="element-symbol">Zp</div>
+            <div class="element-name">Zapier</div>
+            <div class="element-category">Productivity</div>
+        </div>
+        <div class="element design" data-info="Adobe Firefly - AI creative suite">
+            <div class="element-symbol">Af</div>
+            <div class="element-name">Firefly</div>
+            <div class="element-category">Design</div>
+        </div>
+        <div class="element design" data-info="Framer AI - AI website builder">
+            <div class="element-symbol">Fr</div>
+            <div class="element-name">Framer</div>
+            <div class="element-category">Design</div>
+        </div>
+        <div class="element design" data-info="Uizard - AI UI/UX design tool">
+            <div class="element-symbol">Uz</div>
+            <div class="element-name">Uizard</div>
+            <div class="element-category">Design</div>
+        </div>
+        <div class="element image-gen" data-info="Leonardo AI - AI image and art generation">
+            <div class="element-symbol">Le</div>
+            <div class="element-name">Leonardo</div>
+            <div class="element-category">Image</div>
+        </div>
+        <div class="element image-gen" data-info="Artbreeder - AI image mixing and generation">
+            <div class="element-symbol">Ab</div>
+            <div class="element-name">Artbreeder</div>
+            <div class="element-category">Image</div>
+        </div>
+        <div class="element image-gen" data-info="Playground AI - AI image creation platform">
+            <div class="element-symbol">Pg</div>
+            <div class="element-name">Playground</div>
+            <div class="element-category">Image</div>
+        </div>
+        <div class="element image-gen" data-info="NightCafe - AI art generator">
+            <div class="element-symbol">Nc</div>
+            <div class="element-name">NightCafe</div>
+            <div class="element-category">Image</div>
+        </div>
+        <div class="element llm" data-info="Anthropic Claude - Constitutional AI assistant">
+            <div class="element-symbol">An</div>
+            <div class="element-name">Anthropic</div>
+            <div class="element-category">LLM</div>
+        </div>
+        <div class="element llm" data-info="Mistral AI - Open-source language models">
+            <div class="element-symbol">Mi</div>
+            <div class="element-name">Mistral</div>
+            <div class="element-category">LLM</div>
+        </div>
+        <div class="element llm" data-info="Cohere - Enterprise AI language platform">
+            <div class="element-symbol">Co</div>
+            <div class="element-name">Cohere</div>
+            <div class="element-category">LLM</div>
+        </div>
+        <div class="element llm" data-info="Hugging Face - Open-source AI model hub">
+            <div class="element-symbol">Hf</div>
+            <div class="element-name">HuggingFace</div>
+            <div class="element-category">LLM</div>
+        </div>
+    </div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-color llm"></div>
+            <span>Large Language Models</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color image-gen"></div>
+            <span>Image Generation</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color audio"></div>
+            <span>Audio & Music</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color video"></div>
+            <span>Video Generation</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color code"></div>
+            <span>Code Generation</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color research"></div>
+            <span>Research & Analysis</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color productivity"></div>
+            <span>Productivity</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color design"></div>
+            <span>Design Tools</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color data"></div>
+            <span>Data Analysis</span>
+        </div>
+        <div class="legend-item">
+            <div class="legend-color search"></div>
+            <span>AI Search</span>
+        </div>
+    </div>
+
+    <div class="tooltip" id="tooltip"></div>
+
+    <!-- Modal for detailed information -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <div class="modal-icon" id="modalIcon"></div>
+                <div class="modal-title">
+                    <h2 id="modalTitle"></h2>
+                    <div class="modal-category" id="modalCategory"></div>
+                </div>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // Detailed information for each AI tool
+        const toolsData = {
+            'GPT-4': {
+                category: 'Large Language Model',
+                description: 'Advanced multimodal AI language model by OpenAI',
+                features: ['Text generation and completion', 'Code writing and debugging', 'Image analysis', 'Mathematical reasoning', 'Creative writing'],
+                pricing: ['Free tier available', 'ChatGPT Plus: $20/month', 'API usage-based pricing'],
+                website: 'https://openai.com/gpt-4',
+                useCase: 'Ideal for conversational AI, content creation, coding assistance, and complex reasoning tasks.'
+            },
+            'Claude': {
+                category: 'Large Language Model',
+                description: 'Constitutional AI assistant by Anthropic focused on safety and helpfulness',
+                features: ['Long context conversations', 'Code analysis and writing', 'Document analysis', 'Creative writing', 'Ethical reasoning'],
+                pricing: ['Free tier available', 'Claude Pro: $20/month', 'API usage-based pricing'],
+                website: 'https://claude.ai',
+                useCase: 'Perfect for research, writing assistance, code review, and tasks requiring careful reasoning.'
+            },
+            'Gemini': {
+                category: 'Large Language Model',
+                description: 'Google\'s multimodal AI model for text, images, and code',
+                features: ['Multimodal understanding', 'Code generation', 'Image analysis', 'Real-time information access', 'Integration with Google services'],
+                pricing: ['Free tier available', 'Gemini Advanced: $20/month', 'API pricing varies'],
+                website: 'https://gemini.google.com',
+                useCase: 'Great for research with real-time data, multimodal tasks, and Google ecosystem integration.'
+            },
+            'DALL-E': {
+                category: 'Image Generation',
+                description: 'AI image generation from text prompts by OpenAI',
+                features: ['Text-to-image generation', 'Image editing and variations', 'Outpainting and inpainting', 'Style transfer', 'High-resolution outputs'],
+                pricing: ['Free credits included', 'Additional credits: $15 for 115 credits'],
+                website: 'https://openai.com/dall-e-2',
+                useCase: 'Perfect for creating artwork, marketing materials, concept art, and visual content.'
+            },
+            'Midjourney': {
+                category: 'Image Generation',
+                description: 'Premium AI art generation platform known for artistic quality',
+                features: ['Artistic image generation', 'Style customization', 'Aspect ratio control', 'Variations and iterations', 'Community gallery'],
+                pricing: ['Basic: $10/month', 'Standard: $30/month', 'Pro: $60/month'],
+                website: 'https://midjourney.com',
+                useCase: 'Ideal for artists, designers, and creators seeking high-quality artistic images.'
+            },
+            'Stable Diffusion': {
+                category: 'Image Generation',
+                description: 'Open-source image generation model with extensive customization',
+                features: ['Open-source model', 'Local deployment', 'Custom model training', 'ControlNet integration', 'Multiple interfaces available'],
+                pricing: ['Free (open-source)', 'Hosting costs vary', 'Commercial services available'],
+                website: 'https://stability.ai',
+                useCase: 'Best for developers, researchers, and users wanting full control over image generation.'
+            },
+            'GitHub Copilot': {
+                category: 'Code Generation',
+                description: 'AI pair programmer for code completion and generation',
+                features: ['Code autocompletion', 'Function generation', 'Comment-to-code', 'Multiple language support', 'IDE integration'],
+                pricing: ['Individual: $10/month', 'Business: $19/user/month', 'Free for students'],
+                website: 'https://github.com/features/copilot',
+                useCase: 'Essential for developers looking to increase coding productivity and learn new patterns.'
+            },
+            'Cursor': {
+                category: 'Code Generation',
+                description: 'AI-powered code editor with advanced AI integration',
+                features: ['AI code completion', 'Natural language editing', 'Codebase chat', 'AI debugging', 'Multi-file editing'],
+                pricing: ['Free tier available', 'Pro: $20/month'],
+                website: 'https://cursor.sh',
+                useCase: 'Perfect for developers who want an AI-native coding experience with advanced features.'
+            },
+            'ElevenLabs': {
+                category: 'Audio & Voice',
+                description: 'Advanced AI voice synthesis and cloning platform',
+                features: ['Voice cloning', 'Text-to-speech', 'Multiple languages', 'Emotion control', 'Real-time voice conversion'],
+                pricing: ['Free tier: 10,000 chars/month', 'Starter: $5/month', 'Creator: $22/month'],
+                website: 'https://elevenlabs.io',
+                useCase: 'Ideal for content creators, audiobook production, and voice-over work.'
+            },
+            'Runway': {
+                category: 'Video Generation',
+                description: 'AI video generation and editing platform',
+                features: ['Text-to-video generation', 'Video editing tools', 'Green screen removal', 'Motion tracking', 'Style transfer'],
+                pricing: ['Free tier available', 'Standard: $12/month', 'Pro: $28/month'],
+                website: 'https://runwayml.com',
+                useCase: 'Perfect for video creators, filmmakers, and content producers.'
+            },
+            'Notion AI': {
+                category: 'Productivity',
+                description: 'AI-powered workspace for notes, docs, and project management',
+                features: ['AI writing assistant', 'Content generation', 'Document analysis', 'Task automation', 'Team collaboration'],
+                pricing: ['Free tier available', 'Plus: $8/month', 'AI add-on: $10/month'],
+                website: 'https://notion.so',
+                useCase: 'Great for teams and individuals managing projects, notes, and documentation.'
+            },
+            'Perplexity': {
+                category: 'Research & Search',
+                description: 'AI-powered search and research assistant with real-time information',
+                features: ['Real-time search', 'Source citations', 'Follow-up questions', 'Research summaries', 'Academic mode'],
+                pricing: ['Free tier available', 'Pro: $20/month'],
+                website: 'https://perplexity.ai',
+                useCase: 'Excellent for research, fact-checking, and getting up-to-date information with sources.'
+            }
+        };
+
+        function getToolData(toolName) {
+            // Handle variations in tool names
+            const keyMap = {
+                'GPT-4': 'GPT-4',
+                'Claude': 'Claude',
+                'Gemini': 'Gemini',
+                'DALL-E': 'DALL-E',
+                'Midjourney': 'Midjourney',
+                'Stable Diff': 'Stable Diffusion',
+                'Copilot': 'GitHub Copilot',
+                'Cursor': 'Cursor',
+                'ElevenLabs': 'ElevenLabs',
+                'Runway': 'Runway',
+                'Notion AI': 'Notion AI',
+                'Perplexity': 'Perplexity'
+            };
+            
+            const key = keyMap[toolName] || toolName;
+            return toolsData[key] || {
+                category: 'AI Tool',
+                description: 'Innovative AI-powered solution',
+                features: ['Advanced AI capabilities', 'User-friendly interface', 'Regular updates'],
+                pricing: ['Pricing varies'],
+                website: '#',
+                useCase: 'Explore this tool to discover its capabilities.'
+            };
+        }
+
+        function showModal(element) {
+            const toolName = element.querySelector('.element-name').textContent;
+            const toolSymbol = element.querySelector('.element-symbol').textContent;
+            const toolCategory = element.querySelector('.element-category').textContent;
+            const toolData = getToolData(toolName);
+            
+            // Set modal content
+            document.getElementById('modalIcon').textContent = toolSymbol;
+            document.getElementById('modalIcon').className = 'modal-icon ' + element.className.split(' ')[1]; // Get category class
+            document.getElementById('modalTitle').textContent = toolName;
+            document.getElementById('modalCategory').textContent = toolData.category;
+            
+            // Build modal body
+            const modalBody = document.getElementById('modalBody');
+            modalBody.innerHTML = `
+                <div class="modal-section">
+                    <h3>Description</h3>
+                    <p>${toolData.description}</p>
+                </div>
+                
+                <div class="modal-section">
+                    <h3>Key Features</h3>
+                    <ul>
+                        ${toolData.features.map(feature => `<li>${feature}</li>`).join('')}
+                    </ul>
+                </div>
+                
+                <div class="modal-section">
+                    <h3>Pricing</h3>
+                    ${toolData.pricing.map(price => `<span class="pricing-tag">${price}</span>`).join('')}
+                </div>
+                
+                <div class="modal-section">
+                    <h3>Use Case</h3>
+                    <p>${toolData.useCase}</p>
+                </div>
+                
+                ${toolData.website !== '#' ? `<a href="${toolData.website}" target="_blank" class="website-link">Visit Website →</a>` : ''}
+            `;
+            
+            // Show modal
+            document.getElementById('modal').classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('modal').addEventListener('click', (e) => {
+            if (e.target.id === 'modal') {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+        const elements = document.querySelectorAll('.element:not(.empty)');
+        const tooltip = document.getElementById('tooltip');
+
+        elements.forEach(element => {
+            element.addEventListener('mouseenter', (e) => {
+                const info = e.target.closest('.element').dataset.info;
+                if (info) {
+                    tooltip.textContent = info;
+                    tooltip.style.opacity = '1';
+                }
+            });
+
+            element.addEventListener('mousemove', (e) => {
+                tooltip.style.left = e.pageX + 10 + 'px';
+                tooltip.style.top = e.pageY - 50 + 'px';
+            });
+
+            element.addEventListener('mouseleave', () => {
+                tooltip.style.opacity = '0';
+            });
+
+            element.addEventListener('click', (e) => {
+                const clickedElement = e.target.closest('.element');
+                
+                // Quick scale animation
+                clickedElement.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    clickedElement.style.transform = '';
+                }, 150);
+                
+                // Show detailed modal
+                setTimeout(() => {
+                    showModal(clickedElement);
+                }, 100);
+            });
+        });
+
+        // Add some floating particles for visual effect
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.style.position = 'absolute';
+            particle.style.width = Math.random() * 4 + 2 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.background = `hsl(${Math.random() * 360}, 70%, 70%)`;
+            particle.style.borderRadius = '50%';
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            particle.style.top = window.innerHeight + 'px';
+            particle.style.pointerEvents = 'none';
+            particle.style.opacity = '0.7';
+            particle.style.zIndex = '-1';
+            
+            document.body.appendChild(particle);
+            
+            const animation = particle.animate([
+                { transform: 'translateY(0px)', opacity: 0.7 },
+                { transform: `translateY(-${window.innerHeight + 100}px)`, opacity: 0 }
+            ], {
+                duration: Math.random() * 3000 + 2000,
+                easing: 'linear'
+            });
+            
+            animation.onfinish = () => particle.remove();
+        }
+
+        // Create particles occasionally
+        setInterval(createParticle, 500);
+    </script>
+</body>
+</html>
